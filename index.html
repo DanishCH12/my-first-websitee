@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tic-Tac-Toe</title>
+
+<style>
+:root {
+  --bg: #090f20;
+  --panel: #111d36;
+  --line: #254bba;
+  --blue: #20a9ff;
+  --pink: #ff4db5;
+  --text: #f6f7ff;
+  --muted: #a9b9d7;
+  --green: #00c99a;
+  --purple: #852cff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 28px 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(
+    ellipse at top,
+    #19264d 0%,
+    #0b1228 48%,
+    #070b17 100%
+  );
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.app {
+  width: min(100%, 640px);
+  text-align: center;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  font-size: clamp(2rem, 7vw, 3.3rem);
+  font-weight: 750;
+  letter-spacing: -1.4px;
+  margin: 0;
+  text-align: left;
+}
+
+.title span {
+  background: linear-gradient(90deg, #8b5cf6, #d16cff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.theme-btn {
+  flex-shrink: 0;
+  border: 1px solid #203d82;
+  background: #142442;
+  color: var(--text);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.subtitle {
+  margin: 8px 0 22px;
+  color: var(--muted);
+  font-size: clamp(1rem, 3.6vw, 1.35rem);
+  text-align: left;
+}
+
+/* ---------- Screens: landing / home / guidance / game ---------- */
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+.hero {
+  padding: 26px 20px;
+  background: linear-gradient(145deg, #14213d, #101a32);
+  border: 1px solid #1e3472;
+  border-radius: 26px;
+  box-shadow: 0 16px 40px #0003;
+}
+
+.hero-symbols {
+  font-size: clamp(2.4rem, 11vw, 4rem);
+  font-weight: 800;
+  letter-spacing: 12px;
+  margin: 6px 0 10px;
+}
+
+.hero-symbols .s-x { color: #20a9ff; }
+.hero-symbols .s-o { color: #ff4db5; }
+.hero-symbols .s-t { color: #00c99a; }
+
+.hero p {
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0 0 20px;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 22px;
+  text-align: left;
+}
+
+.feature {
+  background: #142442;
+  border: 1px solid #203d82;
+  border-radius: 16px;
+  padding: 13px 12px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.feature strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.95rem;
+}
+
+.section-title {
+  font-size: clamp(1.6rem, 6vw, 2.3rem);
+  margin: 10px 0 6px;
+  text-align: left;
+}
+
+.section-text {
+  color: var(--muted);
+  line-height: 1.6;
+  text-align: left;
+  margin: 0 0 20px;
+}
+
+.guide-card {
+  background: linear-gradient(145deg, #14213d, #101a32);
+  border: 1px solid #1e3472;
+  border-radius: 20px;
+  padding: 18px;
+  text-align: left;
+  margin-bottom: 14px;
+}
+
+.guide-card h3 {
+  margin: 0 0 8px;
+}
+
+.guide-card p,
+.guide-card li {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.guide-card ol,
+.guide-card ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.symbol-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.symbol-list span {
+  border: 1px solid #203d82;
+  background: #142442;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-weight: 700;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #142442;
+  border: 1px solid #203d82;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.control select {
+  border: 1px solid #254bba;
+  border-radius: 10px;
+  padding: 7px 9px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  background: #0b1228;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.control select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.scoreboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.score-chip {
+  border: 1px solid #203d82;
+  background: #142442;
+  border-radius: 999px;
+  padding: 7px 13px;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.score-chip.active {
+  border-width: 2px;
+  box-shadow: 0 0 14px #287dff33;
+}
+
+.score-chip .draws {
+  color: var(--muted);
+}
+
+.status {
+  padding: 19px 14px;
+  border: 1px solid #203d82;
+  background: linear-gradient(110deg, #142442, #172342);
+  border-radius: 21px;
+  font-size: clamp(1.15rem, 4.5vw, 1.6rem);
+  margin-bottom: 18px;
+  box-shadow: 0 8px 25px #0002;
+}
+
+.board-wrap {
+  padding: clamp(14px, 4vw, 24px);
+  background: linear-gradient(145deg, #14213d, #101a32);
+  border: 1px solid #1e3472;
+  border-radius: 26px;
+  box-shadow: 0 16px 40px #0003;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+  max-width: 410px;
+  margin: auto;
+}
+
+.cell {
+  aspect-ratio: 1;
+  min-width: 0;
+  border: 2px solid #244db8;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #1a2b49, #17233b);
+  color: white;
+  font-size: clamp(2rem, 11vw, 4.2rem);
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background .15s, transform .15s, box-shadow .15s;
+}
+
+.cell:hover:not(:disabled) {
+  background: #24395d;
+  transform: translateY(-2px);
+  box-shadow: 0 0 18px #287dff25;
+}
+
+.cell:disabled {
+  cursor: default;
+}
+
+.cell.p0 { color: #20a9ff; text-shadow: 0 0 18px #168eff55; }
+.cell.p1 { color: #ff4db5; text-shadow: 0 0 18px #ff4db555; }
+.cell.p2 { color: #00c99a; text-shadow: 0 0 18px #00c99a55; }
+.cell.p3 { color: #b678ff; text-shadow: 0 0 18px #852cff55; }
+.cell.p4 { color: #ffb020; text-shadow: 0 0 18px #ffb02055; }
+.cell.p5 { color: #00d8e0; text-shadow: 0 0 18px #00d8e055; }
+
+.cell.winner {
+  background: #163f4c;
+  border-color: #00d8b0;
+  box-shadow: 0 0 20px #00d8b033;
+}
+
+.buttons {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.buttons.stack {
+  flex-direction: column;
+}
+
+.buttons.stack .btn {
+  width: 100%;
+}
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: 16px;
+  padding: 15px 22px;
+  min-width: 0;
+  font-size: clamp(.95rem, 3.3vw, 1.15rem);
+  font-weight: 750;
+  cursor: pointer;
+  color: white;
+  box-shadow: 0 8px 20px #0003;
+}
+
+.restart, .primary {
+  background: linear-gradient(120deg, #00bd91, #00a887);
+  border-color: #00edbd;
+}
+
+.undo {
+  background: linear-gradient(120deg, #913cff, #6c20e9);
+  border-color: #ae75ff;
+}
+
+.reset-scores, .secondary {
+  background: linear-gradient(120deg, #3b82f6, #254bba);
+  border-color: #60a5fa;
+}
+
+.btn.ghost {
+  background: transparent;
+  border-color: #203d82;
+  color: var(--text);
+  box-shadow: none;
+}
+
+.btn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.btn:focus-visible,
+.cell:focus-visible,
+.theme-btn:focus-visible,
+.control select:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+.info {
+  color: var(--muted);
+  font-size: .88rem;
+  line-height: 1.55;
+  margin: 20px 0 0;
+}
+
+/* ---------- Light mode ---------- */
+body[data-theme="light"] {
+  background: linear-gradient(180deg, #eef2ff 0%, #dbeafe 55%, #f8fafc 100%);
+  color: #16203a;
+}
+
+body[data-theme="light"] .theme-btn,
+body[data-theme="light"] .control,
+body[data-theme="light"] .score-chip,
+body[data-theme="light"] .feature,
+body[data-theme="light"] .symbol-list span {
+  background: #ffffff;
+  border-color: #c7d2fe;
+  color: #16203a;
+}
+
+body[data-theme="light"] .control select {
+  background: #f1f5ff;
+  border-color: #aab8dd;
+  color: #16203a;
+}
+
+body[data-theme="light"] .subtitle,
+body[data-theme="light"] .info,
+body[data-theme="light"] .score-chip .draws,
+body[data-theme="light"] .section-text,
+body[data-theme="light"] .hero p,
+body[data-theme="light"] .guide-card p,
+body[data-theme="light"] .guide-card li {
+  color: #5a6b8f;
+}
+
+body[data-theme="light"] .status,
+body[data-theme="light"] .hero,
+body[data-theme="light"] .guide-card {
+  background: #ffffff;
+  border-color: #c7d2fe;
+  color: #16203a;
+  box-shadow: 0 8px 25px #0001;
+}
+
+body[data-theme="light"] .board-wrap {
+  background: #ffffff;
+  border-color: #dbe2f0;
+  box-shadow: 0 16px 40px #0001;
+}
+
+body[data-theme="light"] .cell {
+  background: #f1f5ff;
+  border-color: #aab8dd;
+}
+
+body[data-theme="light"] .cell:hover:not(:disabled) {
+  background: #e2eaff;
+}
+
+body[data-theme="light"] .cell.winner {
+  background: #d1fae5;
+  border-color: #00a887;
+}
+
+body[data-theme="light"] .btn.ghost {
+  color: #16203a;
+  border-color: #c7d2fe;
+}
+
+/* ---------- Dark mode: charcoal + mint/violet (replaces the old blue-heavy dark theme) ---------- */
+body[data-theme="dark"] {
+  background: radial-gradient(
+    ellipse at top,
+    #1b2236 0%,
+    #0d1017 50%,
+    #08090d 100%
+  );
+  color: #eef1f8;
+}
+
+body[data-theme="dark"] .title span {
+  background: linear-gradient(90deg, #00e5a0, #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+body[data-theme="dark"] .theme-btn,
+body[data-theme="dark"] .control,
+body[data-theme="dark"] .score-chip,
+body[data-theme="dark"] .feature,
+body[data-theme="dark"] .symbol-list span {
+  background: #1a1f2e;
+  border-color: #2c364d;
+  color: #eef1f8;
+}
+
+body[data-theme="dark"] .control select {
+  background: #121623;
+  border-color: #2c364d;
+  color: #eef1f8;
+}
+
+body[data-theme="dark"] .subtitle,
+body[data-theme="dark"] .info,
+body[data-theme="dark"] .score-chip .draws,
+body[data-theme="dark"] .section-text,
+body[data-theme="dark"] .hero p,
+body[data-theme="dark"] .guide-card p,
+body[data-theme="dark"] .guide-card li {
+  color: #9aa6bf;
+}
+
+body[data-theme="dark"] .hero,
+body[data-theme="dark"] .guide-card,
+body[data-theme="dark"] .status,
+body[data-theme="dark"] .board-wrap {
+  background: linear-gradient(145deg, #1a1f2e, #141927);
+  border-color: #2c364d;
+  box-shadow: 0 16px 40px #0005;
+}
+
+body[data-theme="dark"] .cell {
+  background: linear-gradient(145deg, #232a3f, #1a1f2e);
+  border-color: #33406a;
+}
+
+body[data-theme="dark"] .cell:hover:not(:disabled) {
+  background: #2a3350;
+  box-shadow: 0 0 18px #00e5a033;
+}
+
+body[data-theme="dark"] .cell.winner {
+  background: #12332b;
+  border-color: #00e5a0;
+  box-shadow: 0 0 20px #00e5a033;
+}
+
+body[data-theme="dark"] .btn.ghost {
+  border-color: #2c364d;
+  color: #eef1f8;
+}
+
+@media (max-width: 420px) {
+  body {
+    padding: 22px 12px;
+  }
+
+  .buttons {
+    gap: 9px;
+  }
+
+  .btn {
+    padding: 14px 13px;
+    flex: 1;
+  }
+
+  .buttons.stack .btn {
+    flex: none;
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+  }
+
+  .cell {
+    border-radius: 11px;
+  }
+
+  .status {
+    padding: 16px 10px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="app">
+
+  <div class="topbar">
+    <h1 class="title">
+      <span>Tic-Tac-Toe</span>
+    </h1>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle dark and light mode">
+      ☀️ Light
+    </button>
+  </div>
+
+  <p class="subtitle">Beginner-friendly learning activity</p>
+
+  <!-- ============ LANDING PAGE ============ -->
+  <section class="screen active" id="screen-landing" aria-label="Landing page">
+    <div class="hero">
+      <div class="hero-symbols" aria-hidden="true">
+        <span class="s-x">X</span><span class="s-o">O</span><span class="s-t">▲</span>
+      </div>
+      <h2 style="margin:0 0 8px;">Get three in a row to win!</h2>
+      <p>A quick, classic game for one player against the computer, or up to 6 players on the same device.</p>
+      <div class="buttons stack">
+        <button class="btn primary" id="landingPlay" type="button">▶ &nbsp; Play Game</button>
+        <button class="btn secondary" id="landingGuide" type="button">📖 &nbsp; How to Play</button>
+      </div>
+    </div>
+
+    <div class="features">
+      <div class="feature"><strong>🌗 Dark / Light</strong>Switch theme from the top button. Your choice is saved.</div>
+      <div class="feature"><strong>👥 2–6 Players</strong>Every player gets a different symbol and colour.</div>
+      <div class="feature"><strong>🤖 Vs Computer</strong>Play alone as X against a computer that tries to win and block you.</div>
+    </div>
+  </section>
+
+  <!-- ============ HOME SCREEN ============ -->
+  <section class="screen" id="screen-home" aria-label="Home screen">
+    <h2 class="section-title">Home</h2>
+    <p class="section-text">Choose how you want to play, then press Start Game.</p>
+
+    <div class="controls">
+      <label class="control">
+        Mode
+        <select id="modeSelect" aria-label="Game mode">
+          <option value="single">1 Player vs Computer</option>
+          <option value="multi" selected>Multiplayer</option>
+        </select>
+      </label>
+
+      <label class="control">
+        Players
+        <select id="playerCountSelect" aria-label="Number of players">
+          <option value="2" selected>2 Players</option>
+          <option value="3">3 Players</option>
+          <option value="4">4 Players</option>
+          <option value="5">5 Players</option>
+          <option value="6">6 Players</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="buttons stack">
+      <button class="btn primary" id="startGame" type="button">▶ &nbsp; Start Game</button>
+      <button class="btn secondary" id="homeGuide" type="button">📖 &nbsp; How to Play</button>
+      <button class="btn ghost" id="homeBack" type="button">← &nbsp; Back to Landing</button>
+    </div>
+
+    <p class="info">In 1-player mode the Players choice is locked to 2 (you + computer). In multiplayer, players take turns on the same device.</p>
+  </section>
+
+  <!-- ============ GUIDANCE PAGE ============ -->
+  <section class="screen" id="screen-guidance" aria-label="Guidance page">
+    <h2 class="section-title">How to Play</h2>
+    <p class="section-text">Everything you need before your first move.</p>
+
+    <div class="guide-card">
+      <h3>🎯 Goal of the game</h3>
+      <p>Get three of your symbols in a row — across, down, or diagonally — before anyone else does. If all 9 boxes fill up with no winner, the game is a draw.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>🕹️ How a game works</h3>
+      <ol>
+        <li>Pick a mode on the Home screen: 1 Player vs Computer, or Multiplayer.</li>
+        <li>Press <strong>Start Game</strong>.</li>
+        <li>Players take turns tapping an empty box.</li>
+        <li>The winning line lights up, and the winner's score goes up by 1.</li>
+        <li>Press <strong>Restart Game</strong> for a new round — scores stay. Press <strong>Reset Scores</strong> to start scores from zero.</li>
+      </ol>
+    </div>
+
+    <div class="guide-card">
+      <h3>🎨 Player symbols and colours</h3>
+      <p>Every player has a different symbol and colour, so turns are easy to follow on the scoreboard.</p>
+      <div class="symbol-list">
+        <span style="color:#20a9ff;">Player 1 — X</span>
+        <span style="color:#ff4db5;">Player 2 — O</span>
+        <span style="color:#00c99a;">Player 3 — ▲</span>
+        <span style="color:#b678ff;">Player 4 — ■</span>
+        <span style="color:#ffb020;">Player 5 — ★</span>
+        <span style="color:#00d8e0;">Player 6 — ◆</span>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <h3>🤖 Playing against the computer</h3>
+      <p>You play X and the computer plays O. The computer is not random: first it tries to win, then it blocks your win, then it takes the centre, then a corner.</p>
+      <p><strong>Undo</strong> in this mode takes back both your move and the computer's move, so it is your turn again. In multiplayer, Undo takes back just one move.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>💡 Tips</h3>
+      <ul>
+        <li>Take the centre first if it is free — it is part of 4 winning lines.</li>
+        <li>Watch for two of your symbols in a line, and two of your opponent's.</li>
+        <li>With 5 or 6 players the board still has only 9 boxes, so each player gets just 1–2 turns and draws are much more common. That is a 3×3 board limit, not a bug.</li>
+      </ul>
+    </div>
+
+    <div class="buttons stack">
+      <button class="btn primary" id="guidePlay" type="button">▶ &nbsp; Play Game</button>
+      <button class="btn ghost" id="guideBack" type="button">← &nbsp; Back</button>
+    </div>
+  </section>
+
+  <!-- ============ GAME SCREEN ============ -->
+  <section class="screen" id="screen-game" aria-label="Game screen">
+    <div class="scoreboard" id="scoreboard" aria-live="polite"></div>
+
+    <div class="status" id="status" aria-live="polite"></div>
+
+    <div class="board-wrap">
+      <div
+        class="board"
+        id="board"
+        role="group"
+        aria-label="Tic-Tac-Toe game board">
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button class="btn restart" id="restart" type="button">
+        ⟳ &nbsp; Restart Game
+      </button>
+
+      <button class="btn undo" id="undo" type="button">
+        ↶ &nbsp; Undo
+      </button>
+
+      <button class="btn reset-scores" id="resetScores" type="button">
+        Reset Scores
+      </button>
+    </div>
+
+    <div class="buttons">
+      <button class="btn ghost" id="gameHome" type="button">🏠 &nbsp; Home</button>
+      <button class="btn ghost" id="gameGuide" type="button">📖 &nbsp; How to Play</button>
+    </div>
+
+    <p class="info" id="info">
+      Take turns placing your symbol. Get three in a row to win.
+      In 1-player mode you play X and the computer plays O.
+      In multiplayer, players take turns on the same device.
+    </p>
+  </section>
+
+</main>
+
+<script>
+// ---------- Screen navigation: landing / home / guidance / game ----------
+let guidanceReturn = 'home';
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach((s) => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function openGuidance(from) {
+  guidanceReturn = from;
+  showScreen('screen-guidance');
+}
+
+document.getElementById('landingPlay').addEventListener('click', () => showScreen('screen-home'));
+document.getElementById('landingGuide').addEventListener('click', () => openGuidance('landing'));
+document.getElementById('homeBack').addEventListener('click', () => showScreen('screen-landing'));
+document.getElementById('homeGuide').addEventListener('click', () => openGuidance('home'));
+document.getElementById('guideBack').addEventListener('click', () => showScreen('screen-' + guidanceReturn));
+document.getElementById('guidePlay').addEventListener('click', () => showScreen('screen-home'));
+document.getElementById('gameHome').addEventListener('click', () => showScreen('screen-home'));
+document.getElementById('gameGuide').addEventListener('click', () => openGuidance('game'));
+
+// ---------- Players: symbol + colour for up to 6 players ----------
+const PLAYERS = [
+  { symbol: 'X', color: '#20a9ff', name: 'Player 1' },
+  { symbol: 'O', color: '#ff4db5', name: 'Player 2' },
+  { symbol: '▲', color: '#00c99a', name: 'Player 3' },
+  { symbol: '■', color: '#b678ff', name: 'Player 4' },
+  { symbol: '★', color: '#ffb020', name: 'Player 5' },
+  { symbol: '◆', color: '#00d8e0', name: 'Player 6' }
+];
+
+let mode = 'multi'; // 'single' = 1 player vs computer, 'multi' = 2-6 players
+let playerCount = 2;
+let squares = Array(9).fill(null); // each entry is a player index (0-5) or null
+let current = 0; // index of player whose turn it is
+let history = [];
+let scores = Array(6).fill(0);
+let draws = 0;
+let scoredGame = false; // so a finished game is only counted once
+let computerTimer = null;
+
+const board = document.getElementById('board');
+const status = document.getElementById('status');
+const scoreboard = document.getElementById('scoreboard');
+const undoBtn = document.getElementById('undo');
+const modeSelect = document.getElementById('modeSelect');
+const playerCountSelect = document.getElementById('playerCountSelect');
+const themeBtn = document.getElementById('themeBtn');
+
+const wins = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6]
+];
+
+function activePlayerCount() {
+  return mode === 'single' ? 2 : playerCount;
+}
+
+function playerLabel(i) {
+  if (mode === 'single') {
+    return i === 0 ? 'You (X)' : 'Computer (O)';
+  }
+  return PLAYERS[i].name + ' (' + PLAYERS[i].symbol + ')';
+}
+
+function winningLine() {
+  for (const line of wins) {
+    if (
+      squares[line[0]] !== null &&
+      squares[line[0]] === squares[line[1]] &&
+      squares[line[1]] === squares[line[2]]
+    ) {
+      return line;
+    }
+  }
+  return null;
+}
+
+function isGameOver() {
+  return !!winningLine() || squares.every((v) => v !== null);
+}
+
+function countScore() {
+  if (scoredGame) return;
+  scoredGame = true;
+  const line = winningLine();
+  if (line) {
+    scores[squares[line[0]]] += 1;
+  } else if (squares.every((v) => v !== null)) {
+    draws += 1;
+  }
+}
+
+function renderScoreboard() {
+  const count = activePlayerCount();
+  let html = '';
+  for (let i = 0; i < count; i++) {
+    html += '<span class="score-chip' + (i === current && !isGameOver() ? ' active' : '') + '" style="color:' + PLAYERS[i].color + '">' +
+      playerLabel(i) + ': ' + scores[i] + '</span>';
+  }
+  html += '<span class="score-chip"><span class="draws">Draws: ' + draws + '</span></span>';
+  scoreboard.innerHTML = html;
+}
+
+function render() {
+  const line = winningLine();
+  const winner = line ? squares[line[0]] : null;
+
+  if (winner !== null) {
+    countScore();
+    status.innerHTML = 'Winner: <strong style="color:' + PLAYERS[winner].color + '">' +
+      playerLabel(winner) + '</strong> 🎉';
+  } else if (squares.every((v) => v !== null)) {
+    countScore();
+    status.textContent = 'It’s a draw!';
+  } else if (mode === 'single' && current === 1) {
+    status.innerHTML = 'Computer is thinking… <strong style="color:' + PLAYERS[1].color + '">(O)</strong>';
+  } else {
+    status.innerHTML = 'Next Player: <strong style="color:' + PLAYERS[current].color + '">' +
+      playerLabel(current) + '</strong>';
+  }
+
+  renderScoreboard();
+
+  board.innerHTML = '';
+
+  squares.forEach((value, i) => {
+    const cell = document.createElement('button');
+    cell.type = 'button';
+    cell.className = 'cell' +
+      (value !== null ? ' p' + value : '') +
+      (line && line.includes(i) ? ' winner' : '');
+    cell.textContent = value !== null ? PLAYERS[value].symbol : '';
+    cell.setAttribute(
+      'aria-label',
+      'Cell ' + (i + 1) + (value !== null ? ', ' + PLAYERS[value].symbol : '')
+    );
+    cell.disabled =
+      value !== null ||
+      winner !== null ||
+      squares.every((v) => v !== null) ||
+      (mode === 'single' && current === 1);
+    cell.addEventListener('click', () => move(i));
+    board.appendChild(cell);
+  });
+
+  undoBtn.disabled = history.length === 0;
+}
+
+function doMove(i) {
+  history.push({ squares: [...squares], current });
+  squares[i] = current;
+  current = (current + 1) % activePlayerCount();
+  scoredGame = false;
+  render();
+  maybeComputerMove();
+}
+
+function move(i) {
+  if (squares[i] !== null || isGameOver()) return;
+  // In single-player mode, clicks are ignored on the computer's turn.
+  if (mode === 'single' && current === 1) return;
+  doMove(i);
+}
+
+// ---------- Simple computer AI: win > block > centre > corner > random ----------
+function findMoveFor(playerIndex) {
+  for (const line of wins) {
+    const values = line.map((i) => squares[i]);
+    const mine = values.filter((v) => v === playerIndex).length;
+    const empty = line.filter((i) => squares[i] === null);
+    if (mine === 2 && empty.length === 1) return empty[0];
+  }
+  return -1;
+}
+
+function computerMove() {
+  if (mode !== 'single' || current !== 1 || isGameOver()) return;
+  let pick = findMoveFor(1); // win if possible
+  if (pick === -1) pick = findMoveFor(0); // block the player
+  if (pick === -1 && squares[4] === null) pick = 4; // centre
+  if (pick === -1) {
+    const corners = [0, 2, 6, 8].filter((i) => squares[i] === null);
+    if (corners.length) pick = corners[Math.floor(Math.random() * corners.length)];
+  }
+  if (pick === -1) {
+    const empty = squares.map((v, i) => (v === null ? i : -1)).filter((i) => i !== -1);
+    if (empty.length) pick = empty[Math.floor(Math.random() * empty.length)];
+  }
+  if (pick !== -1) doMove(pick);
+}
+
+function maybeComputerMove() {
+  if (computerTimer) clearTimeout(computerTimer);
+  if (mode === 'single' && current === 1 && !isGameOver()) {
+    computerTimer = setTimeout(computerMove, 450);
+  }
+}
+
+function resetBoard() {
+  if (computerTimer) clearTimeout(computerTimer);
+  squares = Array(9).fill(null);
+  current = 0;
+  history = [];
+  scoredGame = false;
+  render();
+  maybeComputerMove();
+}
+
+function syncModeControls() {
+  playerCountSelect.disabled = mode === 'single';
+  if (mode === 'single') {
+    playerCountSelect.value = '2';
+  }
+}
+
+modeSelect.addEventListener('change', () => {
+  mode = modeSelect.value;
+  scores = Array(6).fill(0);
+  draws = 0;
+  syncModeControls();
+  resetBoard();
+});
+
+playerCountSelect.addEventListener('change', () => {
+  playerCount = parseInt(playerCountSelect.value, 10);
+  scores = Array(6).fill(0);
+  draws = 0;
+  resetBoard();
+});
+
+document.getElementById('startGame').addEventListener('click', () => {
+  resetBoard();
+  showScreen('screen-game');
+});
+
+document.getElementById('restart').addEventListener('click', resetBoard);
+
+document.getElementById('resetScores').addEventListener('click', () => {
+  scores = Array(6).fill(0);
+  draws = 0;
+  render();
+});
+
+undoBtn.addEventListener('click', () => {
+  if (computerTimer) clearTimeout(computerTimer);
+  if (!history.length) return;
+
+  // In single-player mode, undo both the computer's move and your move,
+  // so it is your turn again. In multiplayer, undo just one move.
+  let steps = 1;
+  if (mode === 'single' && history.length >= 2) steps = 2;
+
+  for (let s = 0; s < steps; s++) {
+    const last = history.pop();
+    if (!last) break;
+    squares = [...last.squares];
+    current = last.current;
+  }
+  scoredGame = false;
+  render();
+});
+
+// ---------- Dark / Light mode ----------
+function applyTheme(theme) {
+  document.body.setAttribute('data-theme', theme);
+  themeBtn.textContent = theme === 'light' ? '🌙 Dark' : '☀️ Light';
+  try { localStorage.setItem('ttt-theme', theme); } catch (e) {}
+}
+
+themeBtn.addEventListener('click', () => {
+  const nextTheme = document.body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  applyTheme(nextTheme);
+});
+
+(function initTheme() {
+  let saved = 'dark';
+  try { saved = localStorage.getItem('ttt-theme') || 'dark'; } catch (e) {}
+  if (saved !== 'light' && saved !== 'dark') saved = 'dark';
+  applyTheme(saved);
+})();
+
+syncModeControls();
+render();
+</script>
+
+</body>
+</html>
